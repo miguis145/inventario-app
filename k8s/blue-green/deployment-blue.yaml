@@ -22,8 +22,8 @@ spec:
       containers:
         - name: inventario-app
 
-          # Reemplaza usuario y SHA_BLUE.
-          image: ghcr.io/REEMPLAZAR_USUARIO/inventario-app:SHA_BLUE
+          
+          image: ghcr.io/miguis145/inventario-app:64b3b69e66097ef17faca91106813503599afb74
           imagePullPolicy: Always
 
           ports:
