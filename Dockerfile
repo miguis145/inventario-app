@@ -1,6 +1,5 @@
 # Etapa 1: instala dependencias y ejecuta las pruebas.
-FROM node:20-alpine AS test
-
+FROM node:24-alpine3.24 AS test
 # Todos los comandos siguientes se ejecutan dentro de /app.
 WORKDIR /app
 
@@ -18,8 +17,7 @@ COPY public ./public
 RUN npm test
 
 # Etapa 2: crea una imagen final pequeña, sin archivos de pruebas.
-FROM node:20-alpine AS production
-
+FROM node:24-alpine3.24 AS production
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000

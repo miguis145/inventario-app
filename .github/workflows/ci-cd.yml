@@ -1,82 +1,69 @@
 name: CI/CD Inventario App
 
-# Eventos que activan el pipeline
 on:
-  # Ejecutar automáticamente cuando se haga push a main
   push:
     branches:
       - main
-
-  # Permitir ejecutarlo manualmente desde GitHub
   workflow_dispatch:
 
-# Permisos del token automático de GitHub
 permissions:
-  # Permite descargar y leer el código del repositorio
   contents: read
-
-  # Permite publicar imágenes Docker en GHCR
   packages: write
 
 jobs:
 
   # =====================================================
-  # JOB 1: INSTALAR DEPENDENCIAS Y EJECUTAR PRUEBAS
+  # JOB 1: PRUEBAS AUTOMÁTICAS
   # =====================================================
   build-test:
     name: Probar aplicación
     runs-on: ubuntu-latest
 
     steps:
-
-      # Descarga el código del repositorio
       - name: Descargar repositorio
         uses: actions/checkout@v4
 
-      # Instala Node.js 20
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: npm
 
-      # Instala exactamente las versiones de package-lock.json
       - name: Instalar dependencias
         run: npm ci
 
-      # Ejecuta las pruebas automáticas
       - name: Ejecutar pruebas
         run: npm test
 
 
   # =====================================================
-  # JOB 2: CONSTRUIR, ESCANEAR Y PUBLICAR LA IMAGEN
+  # JOB 2: CONSTRUIR, ESCANEAR Y PUBLICAR
   # =====================================================
   build-push:
     name: Construir, escanear y publicar imagen
     runs-on: ubuntu-latest
-
-    # Este job depende de build-test
     needs: build-test
 
     steps:
-
-      # Descarga nuevamente el código
       - name: Descargar repositorio
         uses: actions/checkout@v4
 
-      # Prepara Docker Buildx
       - name: Configurar Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # GHCR requiere nombres en minúsculas
-      - name: Convertir nombre de imagen a minúsculas
+      # GITHUB_REPOSITORY contiene: miguis145/inventario-app
+      # Las dos comas convierten el texto a minúsculas.
+      - name: Preparar nombre de imagen
         id: image
         shell: bash
         run: |
           echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
 
-      # Inicia sesión automáticamente en GHCR
+      - name: Mostrar nombre de imagen
+        shell: bash
+        run: |
+          echo "La imagen será: ${{ steps.image.outputs.name }}"
+
       - name: Iniciar sesión en GHCR
         uses: docker/login-action@v3
         with:
@@ -84,7 +71,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Construye la imagen, pero todavía no la publica
       - name: Construir imagen para escaneo
         uses: docker/build-push-action@v6
         with:
@@ -93,17 +79,20 @@ jobs:
           push: false
           tags: ${{ steps.image.outputs.name }}:${{ github.sha }}
 
-      # Busca vulnerabilidades críticas
       - name: Escanear imagen con Trivy
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ steps.image.outputs.name }}:${{ github.sha }}
+          scan-type: image
+          scanners: vuln
+          vuln-type: os,library
           format: table
           exit-code: '1'
           ignore-unfixed: true
           severity: CRITICAL
+          list-all-pkgs: 'false'
+          version: 'v0.72.0'
 
-      # Publica la imagen usando el SHA y latest
       - name: Publicar etiquetas SHA y latest
         shell: bash
         run: |
