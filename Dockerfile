@@ -1,41 +1,55 @@
-# Etapa 1: instala dependencias y ejecuta las pruebas.
+# =====================================================
+# ETAPA 1: INSTALAR DEPENDENCIAS Y EJECUTAR PRUEBAS
+# =====================================================
 FROM node:24-alpine3.24 AS test
-# Todos los comandos siguientes se ejecutan dentro de /app.
+
+# Carpeta de trabajo dentro del contenedor
 WORKDIR /app
 
-# Se copian primero los archivos de dependencias para aprovechar la caché.
+# Copiar primero los archivos de dependencias
 COPY package*.json ./
 
-# npm ci instala exactamente las versiones registradas en package-lock.json.
+# Instalar exactamente las versiones del package-lock.json
 RUN npm ci
 
-# Se copia el código necesario para ejecutar las pruebas.
+# Copiar el código, las pruebas y la interfaz
 COPY server.js db.js server.test.js ./
 COPY public ./public
 
-# Si una prueba falla, este comando devuelve error y el build se detiene.
+# Si las pruebas fallan, el build se detiene
 RUN npm test
 
-# Etapa 2: crea una imagen final pequeña, sin archivos de pruebas.
+
+# =====================================================
+# ETAPA 2: IMAGEN FINAL DE PRODUCCIÓN
+# =====================================================
 FROM node:24-alpine3.24 AS production
+
 WORKDIR /app
+
+# Variables predeterminadas
 ENV NODE_ENV=production
 ENV PORT=3000
 
+# Copiar archivos de dependencias
 COPY package*.json ./
 
-# Instala únicamente dependencias necesarias en producción.
-RUN npm ci --omit=dev && npm cache clean --force
+# Instalar dependencias de producción y eliminar npm
+RUN npm ci --omit=dev \
+    && npm cache clean --force \
+    && rm -rf /usr/local/lib/node_modules/npm \
+    && rm -f /usr/local/bin/npm \
+    && rm -f /usr/local/bin/npx
 
-# Copia solo los archivos necesarios para ejecutar la aplicación.
+# Copiar solamente los archivos necesarios para ejecutar la aplicación
 COPY server.js db.js ./
 COPY public ./public
 
-# La aplicación creará products.json dentro de esta carpeta.
-RUN mkdir -p data
+# Crear carpeta para los productos
+RUN mkdir -p /app/data
 
-# Documenta que el proceso escucha en el puerto 3000.
+# Puerto utilizado por la aplicación
 EXPOSE 3000
 
-# Comando que se ejecuta cuando inicia el contenedor.
+# La aplicación se ejecuta directamente con Node.js
 CMD ["node", "server.js"]
