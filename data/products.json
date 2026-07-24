@@ -1,0 +1,26 @@
+{
+  "nextId": 4,
+  "products": [
+    {
+      "id": 1,
+      "name": "Teclado mecanico",
+      "sku": "TEC-001",
+      "stock": 25,
+      "price": 45.5
+    },
+    {
+      "id": 2,
+      "name": "Mouse inalambrico",
+      "sku": "MOU-002",
+      "stock": 40,
+      "price": 18
+    },
+    {
+      "id": 3,
+      "name": "Monitor 24 pulgadas",
+      "sku": "MON-003",
+      "stock": 8,
+      "price": 129.99
+    }
+  ]
+}
