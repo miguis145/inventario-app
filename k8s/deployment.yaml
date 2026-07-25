@@ -36,7 +36,7 @@ spec:
         - name: inventario-app
 
           # CAMBIA el usuario y coloca el SHA real de tu commit.
-          image: ghcr.io/miguis145/inventario-app:06f87ac726190688740dd3ac98a45163dd03dbca
+          image: ghcr.io/miguis145/inventario-app:8a26dc39cb6ae2d23aa39387d80169f7fe649c2a
 
           # Obliga a Kubernetes a comprobar la imagen en GHCR.
           imagePullPolicy: Always

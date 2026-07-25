@@ -1,0 +1,26 @@
+COMMIT=8a26dc39cb6ae2d23aa39387d80169f7fe649c2a
+COMMIT_AT=2026-07-25T16:57:29-05:00
+
+kubectl apply -f k8s/deployment.yaml
+deployment.apps/inventario-app created
+
+kubectl apply -f k8s/service.yaml
+service/inventario-service configured
+
+kubectl rollout status deployment/inventario-app --timeout=240s
+Waiting for deployment "inventario-app" rollout to finish: 0 of 2 updated replicas are available...
+Waiting for deployment "inventario-app" rollout to finish: 1 of 2 updated replicas are available...
+deployment "inventario-app" successfully rolled out
+
+kubectl get deployment inventario-app -o wide
+NAME             READY   UP-TO-DATE   AVAILABLE   CONTAINERS       IMAGES
+inventario-app   2/2     2            2           inventario-app   ghcr.io/miguis145/inventario-app:8a26dc39cb6ae2d23aa39387d80169f7fe649c2a
+
+kubectl get deployment inventario-app -o jsonpath="{.spec.template.spec.containers[0].image}"
+ghcr.io/miguis145/inventario-app:8a26dc39cb6ae2d23aa39387d80169f7fe649c2a
+
+Get-Date -Format "yyyy-MM-ddTHH:mm:ssK"
+2026-07-25T17:01:00-05:00
+
+kubectl exec deployment/inventario-app -- node -e "fetch('http://inventario-service/version').then(r=>r.text()).then(console.log)"
+{"version":"v1","color":"blue","hostname":"inventario-app-59f7fcc946-64xvn","apiKeyConfigured":true}
