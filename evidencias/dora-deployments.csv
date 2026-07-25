@@ -1,0 +1,4 @@
+attempt_id,version,sha,commit_at,deployed_at,lead_time,result,required_correction,evidence
+1,initial-invalid-image,64b3b69e66097ef17faca91106813503599afb74,2026-07-24T17:30:02-05:00,,,failed-imagepullbackoff,yes,"README section 25; manifest history and GHCR tag verification"
+2,blue,06f87ac726190688740dd3ac98a45163dd03dbca,2026-07-24T18:35:26-05:00,2026-07-25T14:32:37-05:00,19:57:11,success,no,"kubectl rollout status deployment/inventario-app-blue"
+3,green,20ac3c3f22e165bb0973cdaa7a798ef35546047e,2026-07-24T20:27:06-05:00,2026-07-25T15:00:55-05:00,18:33:49,success,no,"capturas 49 y 50: rollout restart/status deployment/inventario-app-green y Get-Date"

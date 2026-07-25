@@ -1,0 +1,15 @@
+node_modules/
+.git/
+.github/
+evidencias/
+output/
+k8s/
+scripts/
+tmp/
+data/
+.DS_Store
+*.log
+*.md
+patch-*.json
+SHA_*.txt
+ShA_*.TXT

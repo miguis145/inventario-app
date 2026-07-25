@@ -47,7 +47,7 @@ after(() => {
 });
 
 test('GET /health responde 200 y status ok', async () => {
-  const app = createApp();
+  const app = createApp({ startupDelaySeconds: 0 });
   const server = await startServer(app);
   const res = await request(server, 'GET', '/health');
   assert.strictEqual(res.status, 200);
@@ -55,13 +55,36 @@ test('GET /health responde 200 y status ok', async () => {
   server.close();
 });
 
+test('GET /health responde 503 durante el arranque lento y 200 al terminar', async () => {
+  let currentTimeMs = 0;
+  const app = createApp({
+    startupDelaySeconds: 5,
+    startedAtMs: 0,
+    now: () => currentTimeMs,
+  });
+  const server = await startServer(app);
+
+  const starting = await request(server, 'GET', '/health');
+  assert.strictEqual(starting.status, 503);
+  assert.strictEqual(starting.body.status, 'starting');
+  assert.strictEqual(starting.body.readyInSeconds, 5);
+
+  currentTimeMs = 5000;
+  const ready = await request(server, 'GET', '/health');
+  assert.strictEqual(ready.status, 200);
+  assert.strictEqual(ready.body.status, 'ok');
+
+  server.close();
+});
+
 test('GET /version responde con version y color', async () => {
-  const app = createApp();
+  const app = createApp({ apiKey: 'credencial-ficticia', startupDelaySeconds: 0 });
   const server = await startServer(app);
   const res = await request(server, 'GET', '/version');
   assert.strictEqual(res.status, 200);
   assert.ok(res.body.version);
   assert.ok(res.body.color);
+  assert.strictEqual(res.body.apiKeyConfigured, true);
   server.close();
 });
 

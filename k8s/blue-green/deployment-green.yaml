@@ -23,7 +23,7 @@ spec:
         - name: inventario-app
 
           
-          image: ghcr.io/miguis145/inventario-app:64b3b69e66097ef17faca91106813503599afb74
+          image: ghcr.io/miguis145/inventario-app:20ac3c3f22e165bb0973cdaa7a798ef35546047e
           imagePullPolicy: Always
 
           ports:

@@ -1,0 +1,12 @@
+node_modules/
+data/*.json
+!data/.gitkeep
+tmp/
+.DS_Store
+*.log
+SHA_GREEN.txt
+ShA_BLUE.TXT
+
+# Esta captura conserva el material recibido, pero muestra el valor de API_KEY.
+# No debe publicarse ni agregarse al repositorio.
+evidencias/capturas-reales/29-secret-creacion-con-valor-visible.jpg

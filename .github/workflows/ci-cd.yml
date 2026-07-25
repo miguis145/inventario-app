@@ -81,6 +81,8 @@ jobs:
 
       - name: Escanear imagen con Trivy
         uses: aquasecurity/trivy-action@v0.36.0
+        env:
+          TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db:2
         with:
           image-ref: ${{ steps.image.outputs.name }}:${{ github.sha }}
           scan-type: image

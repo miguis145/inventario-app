@@ -17,7 +17,7 @@ COPY server.js db.js server.test.js ./
 COPY public ./public
 
 # Si las pruebas fallan, el build se detiene
-RUN npm test
+RUN npm test && echo "Pruebas completadas"
 
 
 # =====================================================
@@ -42,8 +42,8 @@ RUN npm ci --omit=dev \
     && rm -f /usr/local/bin/npx
 
 # Copiar solamente los archivos necesarios para ejecutar la aplicación
-COPY server.js db.js ./
-COPY public ./public
+COPY --from=test /app/server.js /app/db.js ./
+COPY --from=test /app/public ./public
 
 # Crear carpeta para los productos
 RUN mkdir -p /app/data
