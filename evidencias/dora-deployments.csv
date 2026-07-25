@@ -1,4 +1,4 @@
 attempt_id,version,sha,commit_at,deployed_at,lead_time,result,required_correction,evidence
 1,initial-invalid-image,64b3b69e66097ef17faca91106813503599afb74,2026-07-24T17:30:02-05:00,,,failed-imagepullbackoff,yes,"README section 25; manifest history and GHCR tag verification"
-2,blue,06f87ac726190688740dd3ac98a45163dd03dbca,2026-07-24T18:35:26-05:00,2026-07-25T14:32:37-05:00,19:57:11,success,no,"kubectl rollout status deployment/inventario-app-blue"
-3,green,20ac3c3f22e165bb0973cdaa7a798ef35546047e,2026-07-24T20:27:06-05:00,2026-07-25T15:00:55-05:00,18:33:49,success,no,"capturas 49 y 50: rollout restart/status deployment/inventario-app-green y Get-Date"
+2,corrected-release-1,8a26dc39cb6ae2d23aa39387d80169f7fe649c2a,2026-07-25T16:57:29-05:00,2026-07-25T17:01:00-05:00,00:03:31,success,no,"evidencias/despliegue-8a26dc3.txt"
+3,corrected-release-2,85eaa0fc3990f21c4fd8013e44ba51e0a30ca727,2026-07-25T17:02:01-05:00,2026-07-25T17:04:20-05:00,00:02:19,success,no,"evidencias/despliegue-85eaa0f.txt"

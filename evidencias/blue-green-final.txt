@@ -1,0 +1,38 @@
+IMAGEN_GREEN=ghcr.io/miguis145/inventario-app:85eaa0fc3990f21c4fd8013e44ba51e0a30ca727
+
+kubectl rollout status deployment/inventario-app-blue --timeout=240s
+deployment "inventario-app-blue" successfully rolled out
+
+kubectl rollout status deployment/inventario-app-green --timeout=240s
+deployment "inventario-app-green" successfully rolled out
+
+kubectl get deployments
+NAME                   READY   UP-TO-DATE   AVAILABLE
+inventario-app-blue    2/2     2            2
+inventario-app-green   2/2     2            2
+
+kubectl get secret inventario-secret
+NAME                TYPE     DATA
+inventario-secret   Opaque   1
+
+Eventos de readiness observados en Green:
+Readiness probe failed: connection refused
+Readiness probe failed: HTTP probe failed with statuscode: 503
+Los dos pods Green terminaron Running y Ready 1/1.
+
+kubectl patch service inventario-service --patch-file patch-green.json
+service/inventario-service patched
+SELECTOR_GREEN=app=inventario-app,slot=green
+{"version":"v2","color":"green","hostname":"inventario-app-green-66b66dd7f4-jskkk","apiKeyConfigured":true}
+
+kubectl patch service inventario-service --patch-file patch-blue.json
+service/inventario-service patched
+SELECTOR_ROLLBACK=app=inventario-app,slot=blue
+{"version":"v1","color":"blue","hostname":"inventario-app-blue-c4864fdb6-r7cgn"}
+
+kubectl patch service inventario-service --patch-file patch-green.json
+service/inventario-service patched
+SELECTOR_FINAL=app=inventario-app,slot=green
+{"version":"v2","color":"green","hostname":"inventario-app-green-66b66dd7f4-jdrgx","apiKeyConfigured":true}
+
+VERIFIED_AT=2026-07-25T17:07:34-05:00

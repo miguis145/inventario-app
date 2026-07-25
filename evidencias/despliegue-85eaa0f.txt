@@ -1,0 +1,29 @@
+COMMIT=85eaa0fc3990f21c4fd8013e44ba51e0a30ca727
+COMMIT_AT=2026-07-25T17:02:01-05:00
+
+kubectl set image deployment/inventario-app inventario-app=ghcr.io/miguis145/inventario-app:85eaa0fc3990f21c4fd8013e44ba51e0a30ca727
+deployment.apps/inventario-app image updated
+
+kubectl rollout status deployment/inventario-app --timeout=240s
+Waiting for deployment "inventario-app" rollout to finish: 1 out of 2 new replicas have been updated...
+Waiting for deployment "inventario-app" rollout to finish: 1 of 2 updated replicas are available...
+deployment "inventario-app" successfully rolled out
+
+kubectl get deployment inventario-app -o wide
+NAME             READY   UP-TO-DATE   AVAILABLE   CONTAINERS       IMAGES
+inventario-app   2/2     2            2           inventario-app   ghcr.io/miguis145/inventario-app:85eaa0fc3990f21c4fd8013e44ba51e0a30ca727
+
+kubectl get pods -l app=inventario-app
+NAME                              READY   STATUS    RESTARTS   AGE
+inventario-app-6f575f4468-gplwm   1/1     Running   0          23s
+inventario-app-6f575f4468-rnkmw   1/1     Running   0          23s
+
+Kubernetes Deployment condition:
+Progressing | True | NewReplicaSetAvailable | 2026-07-25T22:04:20Z
+
+Readiness events observed during startup:
+Warning Unhealthy Readiness probe failed: HTTP probe failed with statuscode: 503
+Warning Unhealthy Readiness probe failed: HTTP probe failed with statuscode: 503
+
+DEPLOYED_AT=2026-07-25T17:04:20-05:00
+LEAD_TIME=00:02:19

@@ -367,8 +367,8 @@ def build_pdf():
 
     cards = Table(
         [[
-            metric_card("19:15:30", "Lead time promedio", BLUE),
-            metric_card("1 por día", "Frecuencia de despliegue", CYAN),
+            metric_card("00:02:55", "Lead time promedio", BLUE),
+            metric_card("2 por día", "Frecuencia de despliegue", CYAN),
             metric_card("33,33 %", "Change failure rate", RED),
         ]],
         colWidths=[56 * mm, 56 * mm, 56 * mm],
@@ -392,16 +392,16 @@ def build_pdf():
             p("Lead time", "table_header"),
         ],
         [
-            p("Blue", "table_cell"),
-            p("24-jul 18:35:26", "table_cell"),
-            p("25-jul 14:32:37", "table_cell"),
-            p("19:57:11", "table_cell"),
+            p("Release 1", "table_cell"),
+            p("25-jul 16:57:29", "table_cell"),
+            p("25-jul 17:01:00", "table_cell"),
+            p("00:03:31", "table_cell"),
         ],
         [
-            p("Green", "table_cell"),
-            p("24-jul 20:27:06", "table_cell"),
-            p("25-jul 15:00:55", "table_cell"),
-            p("18:33:49", "table_cell"),
+            p("Release 2", "table_cell"),
+            p("25-jul 17:02:01", "table_cell"),
+            p("25-jul 17:04:20", "table_cell"),
+            p("00:02:19", "table_cell"),
         ],
     ]
     dora_table = Table(dora_data, colWidths=[31 * mm, 45 * mm, 56 * mm, 36 * mm])
@@ -421,11 +421,11 @@ def build_pdf():
     story.append(Spacer(1, 3 * mm))
     story.append(
         p(
-            "Cálculos: dos promociones correctas en dos días equivalen a <b>1 despliegue/día</b>. "
-            "Hubo tres intentos de imágenes versionadas: una etiqueta inexistente falló y Blue/Green "
-            "funcionaron, por lo que <b>1 / 3 × 100 = 33,33 %</b>. En relación con la tabla de niveles "
-            "vista en clase, el lead time menor a un día y la cadencia diaria son los resultados más "
-            "fuertes; el CFR es el cuello de botella y evita considerar el desempeño global como alto.",
+            "Cálculos: dos promociones correctas en un día equivalen a <b>2 despliegues/día</b>. "
+            "El promedio de 00:03:31 y 00:02:19 es <b>00:02:55</b>. En el conjunto auditado hubo "
+            "tres intentos versionados: una etiqueta inexistente falló y las dos imágenes corregidas "
+            "funcionaron, por lo que <b>1 / 3 × 100 = 33,33 %</b>. El CFR conserva de forma transparente "
+            "el fallo histórico y sigue siendo la principal oportunidad de mejora.",
             "small",
         )
     )

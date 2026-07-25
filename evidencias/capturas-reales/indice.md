@@ -58,8 +58,8 @@ Esta carpeta conserva las 63 capturas entregadas para la práctica. Los nombres 
 | 46 | `46-npm-test-start.jpg` | 8 y 9 | Principal | Las cinco pruebas pasan y luego inicia el servidor. |
 | 47 | `47-npm-start.jpg` | 9 | Complementaria | Solo muestra el arranque; la captura 46 contiene pruebas y arranque. |
 | 48 | `48-npm-ci-test-start.jpg` | 7, 8 y 9 | Principal | Muestra instalación, cinco pruebas correctas y el comando de inicio. |
-| 49 | `49-dora-reinicio-green.png` | 26 | Principal | Confirma `kubectl rollout restart deployment/inventario-app-green`. |
-| 50 | `50-dora-rollout-green-fecha.png` | 26 | Principal | Confirma el rollout correcto de Green y registra `2026-07-25T15:00:55-05:00`. |
+| 49 | `49-dora-reinicio-green.png` | 26 | Complementaria | Evidencia un reinicio anterior de Green; no corresponde a los dos SHA del cálculo DORA final. |
+| 50 | `50-dora-rollout-green-fecha.png` | 26 | Complementaria | Registra un despliegue anterior; se conserva como historial y no alimenta el cálculo final. |
 | 51 | `51-versiones-herramientas.png` | 6 | Principal | Muestra las versiones reales de Node.js, npm, Git, Docker, kubectl y Minikube. |
 | 52 | `52-pruebas-automaticas.png` | 8 | Principal | Las seis pruebas actuales terminan correctamente. |
 | 53 | `53-docker-build-multistage.png` | 10 | Principal | El build real utiliza Node 24, ejecuta la etapa `test` y crea producción. |
@@ -72,7 +72,7 @@ Esta carpeta conserva las 63 capturas entregadas para la práctica. Los nombres 
 | 60 | `60-minikube-ready.png` | 14 | Principal | El nodo `ci-cd` está `Ready` y los componentes de Minikube están activos. |
 | 61 | `61-readiness-pods-watch.png` | 24 | Principal | Muestra pods Blue pasando por `0/1` durante el reinicio. |
 | 62 | `62-readiness-rollout-final.png` | 24 | Principal | Confirma el rollout correcto y los nuevos pods Blue en `1/1`. |
-| 63 | `63-metricas-dora-reales.png` | 26 | Principal | Muestra `git log` y la tabla importada con commits, despliegues, lead times y resultados. |
+| 63 | `63-metricas-dora-reales.png` | 26 | No usar | Muestra valores DORA anteriores al despliegue de los dos SHA corregidos. |
 
 ## Selección recomendada para el informe
 

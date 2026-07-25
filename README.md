@@ -421,6 +421,8 @@ La configuración base contiene:
 
 Para desplegar otra imagen con Rolling Update, se reemplaza el SHA del campo `image:` y se vuelve a ejecutar `kubectl apply -f k8s/deployment.yaml`. El comando `kubectl rollout status` permite seguir la actualización hasta que termine o muestre un error.
 
+La verificación final promovió dos imágenes inmutables consecutivas. En ambos casos el deployment terminó con `2/2` réplicas disponibles. Las salidas completas, incluidos SHA, timestamps y eventos de readiness, están en [despliegue 8a26dc3](evidencias/despliegue-8a26dc3.txt) y [despliegue 85eaa0f](evidencias/despliegue-85eaa0f.txt).
+
 ## 17. Acceso mediante port-forward
 
 Exponer el Service en el puerto local `8080`:
@@ -508,6 +510,8 @@ La estrategia utiliza dos Deployments independientes:
 - `inventario-app-green` ejecuta la versión nueva `v2`.
 
 Los pods comparten la etiqueta `app: inventario-app` y se diferencian mediante `slot: blue` o `slot: green`. El Service envía tráfico únicamente al slot indicado por su selector.
+
+En la verificación final, Green utiliza la imagen corregida `85eaa0fc3990f21c4fd8013e44ba51e0a30ca727`. Sus dos pods terminaron `Ready`, recibieron el Secret sin exponerlo y `/version` confirmó `apiKeyConfigured: true`.
 
 Antes de aplicar los archivos, reemplazar las imágenes:
 
@@ -602,6 +606,8 @@ curl.exe "$URL/version"
 
 El primer comando modifica únicamente el selector del Service. La consulta `jsonpath` debe devolver `green`. La respuesta de `/version` debe contener `version: v2` y `color: green`, además del `hostname` del pod que atendió la solicitud.
 
+La prueba final cambió el selector a Green, comprobó la respuesta `v2/green`, volvió temporalmente a Blue para demostrar el rollback y dejó el selector otra vez en Green. La salida real se conserva en [blue-green-final.txt](evidencias/blue-green-final.txt).
+
 Si `$URL` no tiene valor en esa terminal, se debe volver a ejecutar:
 
 ```powershell
@@ -685,6 +691,8 @@ La primera consulta debe devolver HTTP `503` y la segunda HTTP `200`.
 
 El readiness probe consulta `/health` cada tres segundos después de un retraso inicial de dos segundos y admite hasta diez fallas consecutivas. Esa ventana tolera el retraso configurado de 10 o 15 segundos sin enviar tráfico al pod antes de tiempo. La liveness probe empieza después de 30 segundos, por lo que no reinicia el contenedor durante el arranque esperado.
 
+Con la imagen corregida `85eaa0f…`, los eventos reales de Kubernetes registraron primero fallos de readiness por conexión rechazada y HTTP `503`; después los dos pods Green pasaron a `Running 1/1` y el rollout terminó correctamente. Esta secuencia está registrada en [blue-green-final.txt](evidencias/blue-green-final.txt).
+
 Aumentar el número de réplicas no corrige este problema: solo crea más pods que seguirían respondiendo `503` durante su inicialización. La solución correcta es modelar el estado de preparación en `/health` y configurar el readiness probe con tiempos coherentes.
 
 ## 25. Problemas reales encontrados
@@ -754,7 +762,7 @@ Aumentar el número de réplicas no corrige este problema: solo crea más pods q
 
 ## 26. Métricas DORA
 
-Las métricas se calcularon con los timestamps de Git y con la hora registrada inmediatamente después de que `kubectl rollout status` confirmó cada despliegue. La ventana observada comprende el 24 y 25 de julio de 2026.
+Las métricas se recalcularon con dos promociones reales efectuadas el 25 de julio de 2026. Los tiempos de commit provienen de Git y el tiempo de despliegue corresponde al instante en que Kubernetes registró `NewReplicaSetAvailable`; no se utilizó la hora de publicación de GHCR como sustituto.
 
 ### Lead time for changes
 
@@ -768,13 +776,13 @@ Se utilizaron dos imágenes inmutables diferentes:
 
 | Versión | SHA | Commit | Despliegue correcto en Minikube | Lead time |
 |---|---|---|---|---:|
-| Blue | `06f87ac726190688740dd3ac98a45163dd03dbca` | `2026-07-24T18:35:26-05:00` | `2026-07-25T14:32:37-05:00` | `19:57:11` |
-| Green | `20ac3c3f22e165bb0973cdaa7a798ef35546047e` | `2026-07-24T20:27:06-05:00` | `2026-07-25T15:00:55-05:00` | `18:33:49` |
+| Corrected release 1 | `8a26dc39cb6ae2d23aa39387d80169f7fe649c2a` | `2026-07-25T16:57:29-05:00` | `2026-07-25T17:01:00-05:00` | `00:03:31` |
+| Corrected release 2 | `85eaa0fc3990f21c4fd8013e44ba51e0a30ca727` | `2026-07-25T17:02:01-05:00` | `2026-07-25T17:04:20-05:00` | `00:02:19` |
 
 El lead time promedio es:
 
 ```text
-(19:57:11 + 18:33:49) / 2 = 19:15:30
+(00:03:31 + 00:02:19) / 2 = 00:02:55
 ```
 
 ### Frecuencia de despliegue
@@ -785,10 +793,10 @@ Indica cuántos despliegues correctos se realizan durante un periodo:
 Frecuencia de despliegue = despliegues correctos / periodo observado
 ```
 
-Durante los dos días observados se promovieron dos SHA distintos:
+Durante la fecha medida se promovieron dos SHA distintos:
 
 ```text
-Frecuencia = 2 despliegues correctos / 2 días = 1 despliegue por día
+Frecuencia = 2 despliegues correctos / 1 día = 2 despliegues por día
 ```
 
 Los reinicios de readiness y la recarga de una imagen sin un nuevo commit no se cuentan como nuevas promociones, porque no introducen un cambio versionado distinto.
@@ -801,14 +809,14 @@ Mide el porcentaje de despliegues que provocaron una falla, un rollback o una co
 Change failure rate (%) = despliegues fallidos / despliegues totales × 100
 ```
 
-Se registraron tres intentos de promover una imagen versionada: el primer manifiesto apuntó a una etiqueta inexistente y terminó en `ImagePullBackOff`; Blue y Green terminaron correctamente.
+Se conservaron tres intentos versionados en el conjunto auditado: el intento histórico apuntó a una etiqueta inexistente y terminó en `ImagePullBackOff`; las dos promociones corregidas terminaron correctamente.
 
 ```text
 Change failure rate = 1 intento fallido / 3 intentos totales × 100
 Change failure rate = 33,33 %
 ```
 
-Este es el resultado más débil del ejercicio: aunque la frecuencia es diaria y ambos lead times son menores a 24 horas, una de cada tres promociones requirió corregir la referencia de imagen. Reducir este porcentaje exige validar la existencia de la etiqueta en GHCR antes de aplicar el manifiesto.
+El CFR sigue siendo el resultado más débil porque el intento fallido se conserva de forma transparente. Las dos promociones posteriores demostraron que la corrección funciona: el pipeline terminó en verde, la etiqueta SHA existía en GHCR y el rollout llegó a disponibilidad completa. Para reducir el porcentaje en futuras ventanas se debe validar la existencia de la etiqueta antes de aplicar el manifiesto.
 
 Obtener las fechas de los últimos commits:
 
@@ -822,17 +830,7 @@ Registrar la hora real de cada despliegue:
 Get-Date -Format "yyyy-MM-ddTHH:mm:ssK"
 ```
 
-![Historial real de commits para métricas DORA](evidencias/capturas-reales/01-dora-git-log.jpg)
-
-![Hora real del despliegue para métricas DORA](evidencias/capturas-reales/02-dora-fecha-despliegue.jpg)
-
-![Reinicio real del deployment Green](evidencias/capturas-reales/49-dora-reinicio-green.png)
-
-![Rollout correcto de Green y fecha real registrada](evidencias/capturas-reales/50-dora-rollout-green-fecha.png)
-
-![Git log y tabla real de métricas DORA](evidencias/capturas-reales/63-metricas-dora-reales.png)
-
-El archivo [evidencias/dora-deployments.csv](evidencias/dora-deployments.csv) conserva los tres intentos, las fuentes utilizadas y los dos lead times. El intento fallido no tiene hora de despliegue porque nunca llegó a ejecutarse correctamente en el clúster; se conserva como fallo para el cálculo del change failure rate.
+Las capturas DORA anteriores se conservan como historial, pero no se usan para los valores recalculados porque corresponden a despliegues previos. Las fuentes actuales son [despliegue 8a26dc3](evidencias/despliegue-8a26dc3.txt), [despliegue 85eaa0f](evidencias/despliegue-85eaa0f.txt) y [dora-deployments.csv](evidencias/dora-deployments.csv). El intento fallido no tiene hora de despliegue porque nunca alcanzó disponibilidad; se conserva para calcular el change failure rate.
 
 ## 27. Evidencias
 
@@ -852,14 +850,14 @@ El entregable escrito de la Parte II está disponible en [Informe de reflexión 
 | 6 | Análisis de Trivy | Escaneo local con la misma versión y política del workflow | No se detectan vulnerabilidades `CRITICAL` en la imagen final comprobada | [59-trivy-sin-critical.png](evidencias/capturas-reales/59-trivy-sin-critical.png) |
 | 7 | Etiquetas en GHCR | Página pública del paquete | Se observa el paquete publicado y la etiqueta disponible | [31-ghcr-paquete-publico.jpg](evidencias/capturas-reales/31-ghcr-paquete-publico.jpg) |
 | 8 | Nodo de Minikube | `kubectl get nodes` y `minikube -p ci-cd status` | El nodo está `Ready` y los componentes están activos | [60-minikube-ready.png](evidencias/capturas-reales/60-minikube-ready.png) |
-| 9 | Rolling Update | `kubectl rollout status deployment/inventario-app` y consultas de recursos | El rollout termina y las dos réplicas están listas | [23-rollout-base.jpg](evidencias/capturas-reales/23-rollout-base.jpg) — complementaria, tomada desde otra carpeta |
+| 9 | Rolling Update | `kubectl rollout status deployment/inventario-app` y consultas de recursos | Dos SHA distintos terminan con las dos réplicas listas | [despliegue-8a26dc3.txt](evidencias/despliegue-8a26dc3.txt) y [despliegue-85eaa0f.txt](evidencias/despliegue-85eaa0f.txt); captura actual pendiente |
 | 10 | Recreación de un pod | `kubectl delete pod NOMBRE_DEL_POD` y `kubectl get pods -w` | Kubernetes elimina el pod y crea un reemplazo | [18-eliminacion-pod.jpg](evidencias/capturas-reales/18-eliminacion-pod.jpg) |
-| 11 | Blue y Green activos | `kubectl get pods --show-labels` | Hay pods con `slot=blue` y pods con `slot=green` | [11-pods-blue-green-labels.jpg](evidencias/capturas-reales/11-pods-blue-green-labels.jpg) |
-| 12 | Tráfico en Green | Consulta de `curl.exe` al endpoint `/version` de Green | La API informa `v2`, `green` | [07-version-green-8081.jpg](evidencias/capturas-reales/07-version-green-8081.jpg) |
+| 11 | Blue y Green activos | `kubectl get pods --show-labels` | Hay dos pods `slot=blue` y dos pods `slot=green` | [blue-green-final.txt](evidencias/blue-green-final.txt); captura actual pendiente |
+| 12 | Tráfico en Green | Selector del Service y consulta al endpoint `/version` | La API informa `v2`, `green` y `apiKeyConfigured: true` | [blue-green-final.txt](evidencias/blue-green-final.txt); captura actual pendiente |
 | 13 | Rollback a Blue | Selector del Service y `curl.exe "$URL/version"` | El selector es `blue` y la API informa `v1`, `blue` | [04-rollback-blue-version.jpg](evidencias/capturas-reales/04-rollback-blue-version.jpg) |
-| 14 | Readiness | `kubectl rollout restart deployment/inventario-app-blue`, `kubectl get pods -w` y `kubectl rollout status` | Se observa `Running 0/1`, luego el rollout termina y los pods quedan `1/1` | [61-readiness-pods-watch.png](evidencias/capturas-reales/61-readiness-pods-watch.png) y [62-readiness-rollout-final.png](evidencias/capturas-reales/62-readiness-rollout-final.png) |
+| 14 | Readiness | Eventos, pods y `kubectl rollout status` de Green con la imagen corregida | Se observa fallo HTTP `503` durante el arranque y después dos pods `1/1` | [blue-green-final.txt](evidencias/blue-green-final.txt); captura actual pendiente |
 | 15 | Persistencia local | Creación, consulta, eliminación del pod y nueva consulta | El producto local desaparece después de recrear el pod que lo guardó | [16-productos-despues-recreacion.jpg](evidencias/capturas-reales/16-productos-despues-recreacion.jpg) |
-| 16 | Datos para métricas DORA | `git log`, `kubectl rollout restart deployment/inventario-app-green`, `kubectl rollout status`, `Get-Date` e `Import-Csv` | Se comprueba el rollout y se muestran los commits, horas y lead times reales | [49-dora-reinicio-green.png](evidencias/capturas-reales/49-dora-reinicio-green.png), [50-dora-rollout-green-fecha.png](evidencias/capturas-reales/50-dora-rollout-green-fecha.png) y [63-metricas-dora-reales.png](evidencias/capturas-reales/63-metricas-dora-reales.png) |
+| 16 | Datos para métricas DORA | `git log`, condiciones de Deployment e `Import-Csv` | Se muestran los dos SHA, horas, lead times y resultados actuales | [dora-deployments.csv](evidencias/dora-deployments.csv), [despliegue-8a26dc3.txt](evidencias/despliegue-8a26dc3.txt) y [despliegue-85eaa0f.txt](evidencias/despliegue-85eaa0f.txt); captura actual pendiente |
 
 Las capturas deben mostrar el comando y su salida, sin incluir tokens, contraseñas ni el valor de `API_KEY`.
 
