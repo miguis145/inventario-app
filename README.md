@@ -423,6 +423,8 @@ Para desplegar otra imagen con Rolling Update, se reemplaza el SHA del campo `im
 
 La verificación final promovió dos imágenes inmutables consecutivas. En ambos casos el deployment terminó con `2/2` réplicas disponibles. Las salidas completas, incluidos SHA, timestamps y eventos de readiness, están en [despliegue 8a26dc3](evidencias/despliegue-8a26dc3.txt) y [despliegue 85eaa0f](evidencias/despliegue-85eaa0f.txt).
 
+![Rolling Update final con dos réplicas disponibles](evidencias/capturas-reales/64-rolling-update-final.png)
+
 ## 17. Acceso mediante port-forward
 
 Exponer el Service en el puerto local `8080`:
@@ -541,6 +543,8 @@ kubectl get pods --show-labels
 
 ![Pods reales con etiquetas Blue y Green](evidencias/capturas-reales/11-pods-blue-green-labels.jpg)
 
+![Blue, Green y deployment base disponibles en la verificación final](evidencias/capturas-reales/65-blue-green-activos-final.png)
+
 El Service de `k8s/blue-green/service.yaml` inicia con `slot: blue`. Aplicarlo sobre el Service base actualiza su selector porque ambos recursos se llaman `inventario-service`.
 
 ## 20. Obtención de SHA Blue y Green
@@ -608,6 +612,8 @@ El primer comando modifica únicamente el selector del Service. La consulta `jso
 
 La prueba final cambió el selector a Green, comprobó la respuesta `v2/green`, volvió temporalmente a Blue para demostrar el rollback y dejó el selector otra vez en Green. La salida real se conserva en [blue-green-final.txt](evidencias/blue-green-final.txt).
 
+![Secret, selector Green y respuesta v2 con configuración segura](evidencias/capturas-reales/66-service-green-secret-final.png)
+
 Si `$URL` no tiene valor en esa terminal, se debe volver a ejecutar:
 
 ```powershell
@@ -666,9 +672,9 @@ kubectl get pods -w
 
 ![Captura real del reinicio y observación de pods](evidencias/capturas-reales/03-readiness-pods-watch.jpg)
 
-![Readiness real: transición de los pods durante el reinicio](evidencias/capturas-reales/61-readiness-pods-watch.png)
+![Readiness de Green: transición desde 0/1 hasta 1/1](evidencias/capturas-reales/67-readiness-green-transicion-final.png)
 
-![Finalización real del rollout y pods disponibles](evidencias/capturas-reales/62-readiness-rollout-final.png)
+![Rollout final y eventos HTTP 503 de readiness](evidencias/capturas-reales/68-readiness-green-eventos-final.png)
 
 La transición esperada de un contenedor que ya se está ejecutando pero todavía no está listo es:
 
@@ -832,9 +838,11 @@ Get-Date -Format "yyyy-MM-ddTHH:mm:ssK"
 
 Las capturas DORA anteriores se conservan como historial, pero no se usan para los valores recalculados porque corresponden a despliegues previos. Las fuentes actuales son [despliegue 8a26dc3](evidencias/despliegue-8a26dc3.txt), [despliegue 85eaa0f](evidencias/despliegue-85eaa0f.txt) y [dora-deployments.csv](evidencias/dora-deployments.csv). El intento fallido no tiene hora de despliegue porque nunca alcanzó disponibilidad; se conserva para calcular el change failure rate.
 
+![Commits y tabla DORA final con los dos despliegues corregidos](evidencias/capturas-reales/69-dora-final.png)
+
 ## 27. Evidencias
 
-Las 63 capturas proporcionadas (48 JPG y 15 PNG) se conservaron con nombres descriptivos en `evidencias/capturas-reales/`. Las evidencias válidas se colocaron junto al comando correspondiente. Cuando no existe una captura compatible con el estado actual del proyecto, la tabla lo indica como pendiente en vez de utilizar una imagen antigua o inventar un resultado.
+Las 69 capturas proporcionadas (48 JPG y 21 PNG) se conservaron con nombres descriptivos en `evidencias/capturas-reales/`. Las evidencias válidas se colocaron junto al comando correspondiente. Las seis capturas finales sustituyen los registros antiguos o incompletos de Rolling Update, Blue-Green, Secret, readiness y DORA.
 
 El archivo [índice de capturas reales](evidencias/capturas-reales/indice.md) relaciona cada imagen con la sección de esta guía y la clasifica como evidencia principal, complementaria o no recomendable. Las imágenes antiguas, duplicadas, tomadas desde otra carpeta o que dejan visible un valor sensible no se utilizan como evidencia principal.
 
@@ -850,14 +858,14 @@ El entregable escrito de la Parte II está disponible en [Informe de reflexión 
 | 6 | Análisis de Trivy | Escaneo local con la misma versión y política del workflow | No se detectan vulnerabilidades `CRITICAL` en la imagen final comprobada | [59-trivy-sin-critical.png](evidencias/capturas-reales/59-trivy-sin-critical.png) |
 | 7 | Etiquetas en GHCR | Página pública del paquete | Se observa el paquete publicado y la etiqueta disponible | [31-ghcr-paquete-publico.jpg](evidencias/capturas-reales/31-ghcr-paquete-publico.jpg) |
 | 8 | Nodo de Minikube | `kubectl get nodes` y `minikube -p ci-cd status` | El nodo está `Ready` y los componentes están activos | [60-minikube-ready.png](evidencias/capturas-reales/60-minikube-ready.png) |
-| 9 | Rolling Update | `kubectl rollout status deployment/inventario-app` y consultas de recursos | Dos SHA distintos terminan con las dos réplicas listas | [despliegue-8a26dc3.txt](evidencias/despliegue-8a26dc3.txt) y [despliegue-85eaa0f.txt](evidencias/despliegue-85eaa0f.txt); captura actual pendiente |
+| 9 | Rolling Update | `kubectl rollout status deployment/inventario-app` y consultas de recursos | Dos SHA distintos terminan con las dos réplicas listas | [64-rolling-update-final.png](evidencias/capturas-reales/64-rolling-update-final.png), [despliegue-8a26dc3.txt](evidencias/despliegue-8a26dc3.txt) y [despliegue-85eaa0f.txt](evidencias/despliegue-85eaa0f.txt) |
 | 10 | Recreación de un pod | `kubectl delete pod NOMBRE_DEL_POD` y `kubectl get pods -w` | Kubernetes elimina el pod y crea un reemplazo | [18-eliminacion-pod.jpg](evidencias/capturas-reales/18-eliminacion-pod.jpg) |
-| 11 | Blue y Green activos | `kubectl get pods --show-labels` | Hay dos pods `slot=blue` y dos pods `slot=green` | [blue-green-final.txt](evidencias/blue-green-final.txt); captura actual pendiente |
-| 12 | Tráfico en Green | Selector del Service y consulta al endpoint `/version` | La API informa `v2`, `green` y `apiKeyConfigured: true` | [blue-green-final.txt](evidencias/blue-green-final.txt); captura actual pendiente |
+| 11 | Blue y Green activos | `kubectl get pods --show-labels` | Hay dos pods `slot=blue` y dos pods `slot=green` | [65-blue-green-activos-final.png](evidencias/capturas-reales/65-blue-green-activos-final.png) y [blue-green-final.txt](evidencias/blue-green-final.txt) |
+| 12 | Tráfico en Green | Selector del Service y consulta al endpoint `/version` | La API informa `v2`, `green` y `apiKeyConfigured: true` | [66-service-green-secret-final.png](evidencias/capturas-reales/66-service-green-secret-final.png) y [blue-green-final.txt](evidencias/blue-green-final.txt) |
 | 13 | Rollback a Blue | Selector del Service y `curl.exe "$URL/version"` | El selector es `blue` y la API informa `v1`, `blue` | [04-rollback-blue-version.jpg](evidencias/capturas-reales/04-rollback-blue-version.jpg) |
-| 14 | Readiness | Eventos, pods y `kubectl rollout status` de Green con la imagen corregida | Se observa fallo HTTP `503` durante el arranque y después dos pods `1/1` | [blue-green-final.txt](evidencias/blue-green-final.txt); captura actual pendiente |
+| 14 | Readiness | Eventos, pods y `kubectl rollout status` de Green con la imagen corregida | Se observa fallo HTTP `503` durante el arranque y después dos pods `1/1` | [67-readiness-green-transicion-final.png](evidencias/capturas-reales/67-readiness-green-transicion-final.png), [68-readiness-green-eventos-final.png](evidencias/capturas-reales/68-readiness-green-eventos-final.png) y [blue-green-final.txt](evidencias/blue-green-final.txt) |
 | 15 | Persistencia local | Creación, consulta, eliminación del pod y nueva consulta | El producto local desaparece después de recrear el pod que lo guardó | [16-productos-despues-recreacion.jpg](evidencias/capturas-reales/16-productos-despues-recreacion.jpg) |
-| 16 | Datos para métricas DORA | `git log`, condiciones de Deployment e `Import-Csv` | Se muestran los dos SHA, horas, lead times y resultados actuales | [dora-deployments.csv](evidencias/dora-deployments.csv), [despliegue-8a26dc3.txt](evidencias/despliegue-8a26dc3.txt) y [despliegue-85eaa0f.txt](evidencias/despliegue-85eaa0f.txt); captura actual pendiente |
+| 16 | Datos para métricas DORA | `git log`, condiciones de Deployment e `Import-Csv` | Se muestran los dos SHA, horas, lead times y resultados actuales | [69-dora-final.png](evidencias/capturas-reales/69-dora-final.png), [dora-deployments.csv](evidencias/dora-deployments.csv), [despliegue-8a26dc3.txt](evidencias/despliegue-8a26dc3.txt) y [despliegue-85eaa0f.txt](evidencias/despliegue-85eaa0f.txt) |
 
 Las capturas deben mostrar el comando y su salida, sin incluir tokens, contraseñas ni el valor de `API_KEY`.
 

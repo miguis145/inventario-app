@@ -73,9 +73,15 @@ Esta carpeta conserva las 63 capturas entregadas para la práctica. Los nombres 
 | 61 | `61-readiness-pods-watch.png` | 24 | Principal | Muestra pods Blue pasando por `0/1` durante el reinicio. |
 | 62 | `62-readiness-rollout-final.png` | 24 | Principal | Confirma el rollout correcto y los nuevos pods Blue en `1/1`. |
 | 63 | `63-metricas-dora-reales.png` | 26 | No usar | Muestra valores DORA anteriores al despliegue de los dos SHA corregidos. |
+| 64 | `64-rolling-update-final.png` | 16 y 27 | Principal | Confirma el Rolling Update final, la imagen SHA corregida y las dos réplicas disponibles. |
+| 65 | `65-blue-green-activos-final.png` | 19 y 27 | Principal | Muestra los deployments base, Blue y Green disponibles y los pods etiquetados por slot. |
+| 66 | `66-service-green-secret-final.png` | 15, 21 y 27 | Principal | Muestra metadatos seguros del Secret, selector `green` y respuesta `v2` con `apiKeyConfigured: true`. |
+| 67 | `67-readiness-green-transicion-final.png` | 24 y 27 | Principal | Registra la transición real de los pods Green desde `0/1` hasta `1/1`. |
+| 68 | `68-readiness-green-eventos-final.png` | 24 y 27 | Principal | Confirma rollout correcto y eventos de readiness HTTP `503` antes de quedar listo. |
+| 69 | `69-dora-final.png` | 26 y 27 | Principal | Muestra los dos commits desplegados y el CSV con horas, lead times y resultados finales. |
 
 ## Selección recomendada para el informe
 
-Las capturas principales incorporadas en el README son: 1, 2, 3, 4, 6, 7, 8, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 28, 30, 31, 32, 36, 37, 38, 39, 40, 41, 42, 46, 48 y 49 a 63.
+Las capturas finales recomendadas para los apartados auditados son la 64 a la 69. Las capturas anteriores se mantienen como historial y contexto, pero no deben reemplazar estas evidencias actuales.
 
 La captura 29 se conserva únicamente porque formó parte del material recibido. No debe publicarse ni presentarse como evidencia: aunque el valor sea ficticio, enseña la credencial escrita en el comando. La ruta está incluida de forma explícita en `.gitignore` para impedir que `git add .` la incorpore al repositorio.
