@@ -367,9 +367,9 @@ def build_pdf():
 
     cards = Table(
         [[
-            metric_card("00:02:55", "Lead time promedio", BLUE),
-            metric_card("2 por día", "Frecuencia de despliegue", CYAN),
-            metric_card("33,33 %", "Change failure rate", RED),
+            metric_card("00:02:55 · ÉLITE", "Lead time promedio", BLUE),
+            metric_card("2 por día · ÉLITE", "Frecuencia de despliegue", CYAN),
+            metric_card("33,33 % · MEDIO", "Change failure rate", RED),
         ]],
         colWidths=[56 * mm, 56 * mm, 56 * mm],
     )
@@ -424,8 +424,17 @@ def build_pdf():
             "Cálculos: dos promociones correctas en un día equivalen a <b>2 despliegues/día</b>. "
             "El promedio de 00:03:31 y 00:02:19 es <b>00:02:55</b>. En el conjunto auditado hubo "
             "tres intentos versionados: una etiqueta inexistente falló y las dos imágenes corregidas "
-            "funcionaron, por lo que <b>1 / 3 × 100 = 33,33 %</b>. El CFR conserva de forma transparente "
-            "el fallo histórico y sigue siendo la principal oportunidad de mejora.",
+            "funcionaron, por lo que <b>1 / 3 × 100 = 33,33 %</b>.",
+            "small",
+        )
+    )
+    story.append(
+        p(
+            "<b>Relación con la tabla de niveles:</b> el lead time menor de una hora y los dos "
+            "despliegues diarios ubican la velocidad en nivel <b>ÉLITE</b>. El CFR de 33,33 %, "
+            "dentro del rango didáctico de 31 % a 45 %, sitúa la estabilidad en nivel <b>MEDIO</b>. "
+            "El resultado global es mixto: entrega rápida, pero con margen para reducir fallos. "
+            "La muestra contiene solo tres intentos, por lo que los niveles son orientativos.",
             "small",
         )
     )

@@ -824,6 +824,20 @@ Change failure rate = 33,33 %
 
 El CFR sigue siendo el resultado más débil porque el intento fallido se conserva de forma transparente. Las dos promociones posteriores demostraron que la corrección funciona: el pipeline terminó en verde, la etiqueta SHA existía en GHCR y el rollout llegó a disponibilidad completa. Para reducir el porcentaje en futuras ventanas se debe validar la existencia de la etiqueta antes de aplicar el manifiesto.
 
+### Relación con la tabla de niveles DORA
+
+Para interpretar los resultados se utiliza la tabla didáctica de cuatro niveles: **Élite, Alto, Medio y Bajo**. La comparación queda así:
+
+| Métrica | Resultado propio | Rango de referencia | Nivel |
+|---|---:|---|---|
+| Lead time for changes | `00:02:55` | Menos de una hora | **Élite** |
+| Frecuencia de despliegue | `2 despliegues por día` | Varios despliegues diarios | **Élite** |
+| Change failure rate | `33,33 %` | Entre 31 % y 45 % | **Medio** |
+
+La lectura conjunta no debe resumirse diciendo que todo el desempeño es Élite. La velocidad de entrega es **Élite** porque los cambios llegan al clúster en pocos minutos y se promovieron varias veces en un día. La estabilidad es **Media** porque uno de los tres intentos requirió una corrección. Por ello, el principal objetivo de mejora es reducir el change failure rate mediante la validación de la etiqueta SHA en GHCR antes del despliegue.
+
+Estos niveles son una referencia didáctica para interpretar la práctica, no una certificación del proyecto. La muestra contiene solo tres intentos y debe recalcularse cuando exista un periodo de observación mayor.
+
 Obtener las fechas de los últimos commits:
 
 ```powershell
