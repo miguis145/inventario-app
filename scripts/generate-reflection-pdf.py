@@ -29,27 +29,27 @@ MARGIN_X = 18 * mm
 MARGIN_TOP = 21 * mm
 MARGIN_BOTTOM = 17 * mm
 
-NAVY = colors.HexColor("#1F2937")
-BLUE = colors.HexColor("#315A8A")
-CYAN = colors.HexColor("#4B748F")
-LIGHT_BLUE = colors.HexColor("#EDF3F8")
-LIGHT_CYAN = colors.HexColor("#F2F6F8")
-LIGHT_GRAY = colors.HexColor("#F5F5F4")
-TABLE_HEADER = colors.HexColor("#E7E5E4")
-MID_GRAY = colors.HexColor("#5F6368")
-DARK = colors.HexColor("#202124")
+NAVY = colors.HexColor("#222222")
+BLUE = colors.HexColor("#222222")
+CYAN = colors.HexColor("#555555")
+LIGHT_BLUE = colors.HexColor("#F2F2F2")
+LIGHT_CYAN = colors.HexColor("#F7F7F7")
+LIGHT_GRAY = colors.HexColor("#F7F7F7")
+TABLE_HEADER = colors.HexColor("#EDEDED")
+MID_GRAY = colors.HexColor("#666666")
+DARK = colors.HexColor("#111111")
 RED = colors.HexColor("#B42318")
 GREEN = colors.HexColor("#147D64")
 
 
 def register_fonts():
-    regular = Path("C:/Windows/Fonts/times.ttf")
-    bold = Path("C:/Windows/Fonts/timesbd.ttf")
+    regular = Path("C:/Windows/Fonts/arial.ttf")
+    bold = Path("C:/Windows/Fonts/arialbd.ttf")
     if regular.exists() and bold.exists():
         pdfmetrics.registerFont(TTFont("ReportRegular", str(regular)))
         pdfmetrics.registerFont(TTFont("ReportBold", str(bold)))
         return "ReportRegular", "ReportBold"
-    return "Times-Roman", "Times-Bold"
+    return "Helvetica", "Helvetica-Bold"
 
 
 FONT, FONT_BOLD = register_fonts()
@@ -62,8 +62,8 @@ def make_styles():
             "Title",
             parent=styles["Title"],
             fontName=FONT_BOLD,
-            fontSize=18,
-            leading=21,
+            fontSize=16,
+            leading=19,
             textColor=DARK,
             alignment=TA_CENTER,
             spaceAfter=0,
@@ -72,8 +72,8 @@ def make_styles():
             "Subtitle",
             parent=styles["Normal"],
             fontName=FONT,
-            fontSize=10.5,
-            leading=13,
+            fontSize=10,
+            leading=12,
             textColor=MID_GRAY,
             alignment=TA_CENTER,
         ),
@@ -81,19 +81,19 @@ def make_styles():
             "Section",
             parent=styles["Heading2"],
             fontName=FONT_BOLD,
-            fontSize=11.5,
-            leading=14,
+            fontSize=11,
+            leading=13,
             textColor=NAVY,
-            spaceBefore=7,
-            spaceAfter=4,
+            spaceBefore=6,
+            spaceAfter=3,
             keepWithNext=True,
         ),
         "body": ParagraphStyle(
             "Body",
             parent=styles["BodyText"],
             fontName=FONT,
-            fontSize=9.6,
-            leading=13.2,
+            fontSize=9.3,
+            leading=12.6,
             textColor=DARK,
             spaceAfter=6,
         ),
@@ -101,8 +101,8 @@ def make_styles():
             "Small",
             parent=styles["BodyText"],
             fontName=FONT,
-            fontSize=8.6,
-            leading=11.2,
+            fontSize=8.3,
+            leading=10.7,
             textColor=DARK,
         ),
         "metric": ParagraphStyle(
@@ -192,18 +192,18 @@ def bullet(text):
 
 def section_title(number, title):
     number = number.lstrip("0") or "0"
-    return p(f"<font color='#315A8A'>{number}.</font> {title}", "section")
+    return p(f"{number}. {title}", "section")
 
 
 def header_footer(canvas, doc):
     canvas.saveState()
     if doc.page > 1:
-        canvas.setStrokeColor(BLUE)
-        canvas.setLineWidth(0.8)
+        canvas.setStrokeColor(colors.HexColor("#888888"))
+        canvas.setLineWidth(0.5)
         canvas.line(MARGIN_X, PAGE_HEIGHT - 12 * mm, PAGE_WIDTH - MARGIN_X, PAGE_HEIGHT - 12 * mm)
         canvas.setFont(FONT, 8)
         canvas.setFillColor(MID_GRAY)
-        canvas.drawString(MARGIN_X, PAGE_HEIGHT - 9.2 * mm, "Informe de práctica: CI/CD y Kubernetes")
+        canvas.drawString(MARGIN_X, PAGE_HEIGHT - 9.2 * mm, "Informe de reflexión - Parte II")
 
     canvas.setStrokeColor(colors.HexColor("#D8DEE8"))
     canvas.line(MARGIN_X, 12 * mm, PAGE_WIDTH - MARGIN_X, 12 * mm)
@@ -267,9 +267,8 @@ def build_pdf():
 
     heading = Table(
         [
-            [p("INFORME DE PRÁCTICA", "subtitle")],
-            [p("Pruebas, métricas DORA y reflexión sobre el pipeline CI/CD", "title")],
-            [p("Inventario App: Docker, GitHub Actions y Kubernetes", "subtitle")],
+            [p("Informe de reflexión - Parte II", "title")],
+            [p("Pruebas del pipeline CI/CD y métricas DORA propias", "subtitle")],
         ],
         colWidths=[PAGE_WIDTH - 2 * MARGIN_X],
     )
@@ -277,27 +276,21 @@ def build_pdf():
         TableStyle(
             [
                 ("BACKGROUND", (0, 0), (-1, -1), colors.white),
-                ("LINEBELOW", (0, -1), (-1, -1), 1.2, BLUE),
-                ("LEFTPADDING", (0, 0), (-1, -1), 4 * mm),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 4 * mm),
-                ("TOPPADDING", (0, 0), (-1, 0), 1 * mm),
-                ("TOPPADDING", (0, 1), (-1, 1), 2 * mm),
-                ("BOTTOMPADDING", (0, -1), (-1, -1), 3 * mm),
+                ("LEFTPADDING", (0, 0), (-1, -1), 2 * mm),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 2 * mm),
+                ("TOPPADDING", (0, 0), (-1, -1), 1 * mm),
+                ("BOTTOMPADDING", (0, -1), (-1, -1), 2 * mm),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ]
         )
     )
-    story.extend([heading, Spacer(1, 4 * mm)])
+    story.extend([heading, Spacer(1, 3 * mm)])
 
     meta = Table(
         [
             [
                 p("<b>Integrantes:</b>", "small"),
                 p("José Vanegas y Miguel Vanegas", "small"),
-            ],
-            [
-                p("<b>Trabajo:</b>", "small"),
-                p("Parte II: pruebas y elaboración del informe", "small"),
             ],
             [
                 p("<b>Repositorio:</b>", "small"),
@@ -313,14 +306,13 @@ def build_pdf():
     meta.setStyle(
         TableStyle(
             [
-                ("BACKGROUND", (0, 0), (-1, -1), LIGHT_GRAY),
-                ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#D8DEE8")),
-                ("LINEBELOW", (0, 0), (-1, -2), 0.3, colors.HexColor("#D8DEE8")),
+                ("BACKGROUND", (0, 0), (-1, -1), colors.white),
+                ("LINEBELOW", (0, -1), (-1, -1), 0.6, colors.HexColor("#888888")),
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("LEFTPADDING", (0, 0), (-1, -1), 7),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 7),
-                ("TOPPADDING", (0, 0), (-1, -1), 3),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+                ("LEFTPADDING", (0, 0), (-1, -1), 2),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 2),
+                ("TOPPADDING", (0, 0), (-1, -1), 2),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 2),
             ]
         )
     )
@@ -329,10 +321,10 @@ def build_pdf():
     story.append(section_title("01", "Verificación reproducible"))
     story.append(
         p(
-            "El README reúne los comandos en el orden en que se ejecutaron. Las salidas reales están "
-            "en <b>evidencias/capturas-reales</b>, los registros de despliegue y el CSV de métricas. "
-            "Con ese material, otra persona puede repetir las pruebas sin depender de explicaciones "
-            "adicionales."
+            "Para ordenar la entrega fuimos colocando cada comando en el README junto con la salida "
+            "que obtuvimos. Las capturas originales están en <b>evidencias/capturas-reales</b>. También "
+            "dejamos los dos registros de despliegue y el archivo CSV que usamos para calcular DORA. "
+            "Así se puede repetir la práctica siguiendo el mismo orden."
         )
     )
 
@@ -381,101 +373,69 @@ def build_pdf():
     story.append(section_title("02", "Justificación de Blue-Green"))
     story.append(
         p(
-            "Elegimos Blue-Green porque la aplicación expone <b>/version</b> con versión, color y "
-            "hostname. Esto permite comprobar Green por separado y cambiar el tráfico modificando "
-            "solo el selector <b>slot</b> del Service. Blue permanece activo, de modo que el rollback "
-            "consiste en devolver el selector a <b>slot=blue</b>."
+            "Escogimos Blue-Green porque era la forma más directa de mostrar el cambio entre dos "
+            "versiones. El endpoint <b>/version</b> indica la versión, el color y el pod que respondió. "
+            "Primero probamos Green sin mover el tráfico y después cambiamos el selector <b>slot</b> "
+            "del Service. Blue quedó activo por si era necesario regresar."
         )
     )
     story.append(
         p(
-            "Canary habría servido para repartir solicitudes entre versiones, pero habría complicado "
-            "la demostración con una muestra pequeña. Blue-Green consume más recursos porque mantiene "
-            "dos versiones completas, pero el corte y el regreso a Blue son claros y reproducibles."
+            "Pensamos también en Canary, pero para esta práctica pequeña habría sido más difícil "
+            "demostrar qué porcentaje de solicitudes llegaba a cada versión. Blue-Green usa más "
+            "recursos porque mantiene los dos ambientes, aunque el cambio y el rollback se entienden "
+            "mejor al revisar las salidas de los comandos."
         )
     )
 
     story.append(section_title("03", "Persistencia al recrear el pod"))
     story.append(
         p(
-            "El producto creado desde la interfaz quedó en <b>/app/data/products.json</b> dentro del "
-            "contenedor que atendió la solicitud. Al eliminar ese pod, Kubernetes creó otro desde la "
-            "imagen y el producto desapareció. Además, cada réplica conserva su propia copia, por lo "
-            "que dos solicitudes pueden mostrar catálogos distintos."
+            "En esta prueba agregamos un producto desde la interfaz y luego eliminamos el pod que lo "
+            "había guardado. El dato estaba en <b>/app/data/products.json</b>, dentro de ese contenedor. "
+            "Cuando Kubernetes creó el reemplazo, el producto ya no apareció. También notamos que cada "
+            "réplica tenía su propia copia del catálogo."
         )
     )
-    callout = Table(
-        [[p("Conclusión: el Deployment repone procesos, pero no comparte ni conserva los archivos de los contenedores. Un entorno real necesitaría almacenamiento persistente o una base de datos común.", "callout")]],
-        colWidths=[PAGE_WIDTH - 2 * MARGIN_X],
-    )
-    callout.setStyle(
-        TableStyle(
-            [
-                ("BACKGROUND", (0, 0), (-1, -1), LIGHT_GRAY),
-                ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#A8A29E")),
-                ("LEFTPADDING", (0, 0), (-1, -1), 8),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 8),
-                ("TOPPADDING", (0, 0), (-1, -1), 7),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 7),
-            ]
+    story.append(
+        p(
+            "<b>Conclusión de la prueba:</b> recrear el pod recupera la aplicación, pero no los cambios "
+            "hechos en sus archivos. Para conservar el catálogo entre réplicas necesitaríamos una base "
+            "de datos o un volumen compartido."
         )
     )
-    story.append(callout)
 
     story.append(PageBreak())
 
     story.append(section_title("04", "Métricas DORA con datos propios"))
     story.append(
         p(
-            "Git aporta la hora del commit, GitHub registra la finalización de cada run y Kubernetes "
-            "confirma cuándo la imagen quedó disponible en el clúster. El lead time termina en el "
-            "despliegue real, no en la publicación de GHCR. Todas las horas están en UTC-05.",
-            "small",
+            "Tomamos la hora del commit desde Git y la comparamos con la hora en que "
+            "<b>kubectl rollout status</b> confirmó el cambio en el clúster. También anotamos la "
+            "finalización de cada run de GitHub Actions. Todas las horas están en UTC-05."
         )
     )
 
-    summary_data = [
-        [
-            p("Indicador", "table_header"),
-            p("Cálculo realizado", "table_header"),
-            p("Resultado", "table_header"),
-            p("Nivel", "table_header"),
-        ],
-        [
-            p("Lead time for changes", "table_cell_left"),
-            p("(00:03:31 + 00:02:19) / 2", "table_cell"),
-            p("00:02:55", "table_cell"),
-            p("Élite", "table_cell"),
-        ],
-        [
-            p("Frecuencia de despliegue", "table_cell_left"),
-            p("2 cambios correctos / 1 día", "table_cell"),
-            p("2 por día", "table_cell"),
-            p("Élite", "table_cell"),
-        ],
-        [
-            p("Change failure rate", "table_cell_left"),
-            p("1 corrección / 3 intentos × 100", "table_cell"),
-            p("33,33 %", "table_cell"),
-            p("Medio", "table_cell"),
-        ],
-    ]
-    summary_table = Table(
-        summary_data,
-        colWidths=[48 * mm, 63 * mm, 34 * mm, 29 * mm],
-    )
-    summary_table.setStyle(
-        TableStyle(
-            [
-                ("BACKGROUND", (0, 0), (-1, 0), TABLE_HEADER),
-                ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#A8A29E")),
-                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-                ("TOPPADDING", (0, 0), (-1, -1), 4),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-            ]
+    story.append(
+        p(
+            "<b>Lead time for changes.</b> Los dos tiempos fueron 00:03:31 y 00:02:19. "
+            "El promedio es <b>00:02:55</b>, que corresponde al nivel Élite de la tabla usada."
         )
     )
-    story.extend([summary_table, Spacer(1, 4 * mm)])
+    story.append(
+        p(
+            "<b>Frecuencia de despliegue.</b> Promovimos dos cambios correctos durante un día de "
+            "trabajo. El resultado es <b>2 despliegues por día</b>, también clasificado como Élite."
+        )
+    )
+    story.append(
+        p(
+            "<b>Change failure rate.</b> Registramos tres intentos en total. Uno necesitó una "
+            "corrección posterior por ImagePullBackOff. El cálculo es 1 / 3 × 100, por lo que el "
+            "resultado es <b>33,33 %</b> y el nivel es Medio."
+        )
+    )
+    story.append(Spacer(1, 2 * mm))
 
     dora_data = [
         [
@@ -520,25 +480,7 @@ def build_pdf():
         )
     )
     story.append(dora_table)
-    story.append(Spacer(1, 3 * mm))
-    story.append(
-        p(
-            "<b>Cálculos.</b> Dos promociones correctas en un día equivalen a <b>2 despliegues/día</b>. "
-            "El promedio de 00:03:31 y 00:02:19 es <b>00:02:55</b>. Hubo tres intentos: uno necesitó "
-            "corrección y dos terminaron bien. La frecuencia cuenta los dos cambios que sí quedaron "
-            "corriendo; el CFR incluye los tres intentos. Por eso, <b>1 / 3 × 100 = 33,33 %</b>.",
-            "small",
-        )
-    )
-    story.append(
-        p(
-            "<b>Niveles.</b> El lead time menor de una hora y los dos despliegues diarios sitúan la "
-            "velocidad en <b>ÉLITE</b>. El CFR de 33,33 %, dentro del rango didáctico de 31 % a 45 %, "
-            "deja la estabilidad en <b>MEDIO</b>. La muestra contiene solo tres intentos, por lo que "
-            "esta clasificación es orientativa.",
-            "small",
-        )
-    )
+    story.append(Spacer(1, 2 * mm))
     story.append(
         p(
             "Fuentes: Git, runs 30176640875 y 30176786798, evidencias/despliegue-8a26dc3.txt, "
@@ -548,58 +490,42 @@ def build_pdf():
     )
 
     story.append(section_title("05", "Problemas reales y resolución"))
-    problems_data = [
-        [
-            p("Problema observado", "table_header"),
-            p("Diagnóstico y solución aplicada", "table_header"),
-        ],
-        [
-            p("BuildKit omitía la etapa de pruebas.", "table_cell_left"),
-            p("Producción no dependía de test. Ahora copia el código desde esa etapa y el build exige las seis pruebas.", "table_cell_left"),
-        ],
-        [
-            p("Una etiqueta inexistente causó ImagePullBackOff.", "table_cell_left"),
-            p("Se verificó GHCR, se publicó un SHA válido y se repitió el rollout hasta obtener 2/2 réplicas.", "table_cell_left"),
-        ],
-        [
-            p("/health respondía 200 durante el arranque.", "table_cell_left"),
-            p("Se implementó STARTUP_DELAY_SECONDS. Ahora devuelve 503 durante la espera y 200 cuando el pod está listo.", "table_cell_left"),
-        ],
-        [
-            p("Trivy agotó el tiempo al descargar su base.", "table_cell_left"),
-            p("Se usó el repositorio público alternativo. El pipeline final terminó sin hallazgos CRITICAL.", "table_cell_left"),
-        ],
-        [
-            p("PowerShell alteraba el JSON de kubectl patch.", "table_cell_left"),
-            p("Los parches se guardaron en archivos y se aplicaron con --patch-file.", "table_cell_left"),
-        ],
-    ]
-    problems_table = Table(problems_data, colWidths=[59 * mm, 115 * mm])
-    problems_table.setStyle(
-        TableStyle(
-            [
-                ("BACKGROUND", (0, 0), (-1, 0), TABLE_HEADER),
-                ("BACKGROUND", (0, 1), (-1, -1), colors.white),
-                ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#C9D1DC")),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("LEFTPADDING", (0, 0), (-1, -1), 5),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 5),
-                ("TOPPADDING", (0, 0), (-1, -1), 4),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-            ]
+    story.append(
+        p(
+            "<b>BuildKit y las pruebas:</b> al principio la etapa final no dependía de la etapa "
+            "test, por lo que el build podía terminar sin ejecutar la suite. Cambiamos el Dockerfile "
+            "para que producción copie el código desde test."
         )
     )
-    story.append(problems_table)
+    story.append(
+        p(
+            "<b>Imagen incorrecta:</b> una etiqueta SHA que no existía produjo ImagePullBackOff. "
+            "Revisamos GHCR, usamos una etiqueta publicada y repetimos el rollout hasta tener 2/2 pods."
+        )
+    )
+    story.append(
+        p(
+            "<b>Readiness:</b> /health respondía 200 incluso durante el arranque lento. Agregamos "
+            "STARTUP_DELAY_SECONDS y una prueba que comprueba primero el 503 y después el 200."
+        )
+    )
+    story.append(
+        p(
+            "<b>Trivy y PowerShell:</b> Trivy agotó el tiempo al descargar su base y PowerShell "
+            "modificaba el JSON de kubectl patch. Usamos el repositorio alternativo de Trivy y "
+            "guardamos los parches en archivos JSON."
+        )
+    )
 
     story.append(section_title("06", "Reflexión final"))
     story.append(
         p(
-            "La práctica nos obligó a comprobar cada afirmación con una salida real. Vimos que una "
-            "imagen publicada no cuenta como desplegada hasta que Kubernetes la ejecuta, que un pod "
-            "nuevo no recupera archivos locales y que un rollout correcto depende tanto de la imagen "
-            "como del readiness. El proceso terminó rápido, pero el CFR muestra una mejora concreta: "
-            "validar la existencia del SHA en GHCR antes de tocar el Deployment.",
-            "small",
+            "Lo que más trabajo nos tomó fue comprobar que la versión correcta realmente estaba "
+            "corriendo. Una salida parecía suficiente, pero otra prueba mostraba un problema, como "
+            "ocurrió con la etiqueta inexistente y con /health durante el arranque. También entendimos "
+            "por qué el catálogo no debe guardarse dentro del contenedor. Si repitiéramos la práctica, "
+            "validaríamos el SHA en GHCR antes de actualizar el Deployment; eso habría evitado el "
+            "intento fallido que elevó el CFR.",
         )
     )
 
