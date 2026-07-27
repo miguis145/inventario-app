@@ -29,26 +29,27 @@ MARGIN_X = 18 * mm
 MARGIN_TOP = 21 * mm
 MARGIN_BOTTOM = 17 * mm
 
-NAVY = colors.HexColor("#132238")
-BLUE = colors.HexColor("#1D4ED8")
-CYAN = colors.HexColor("#0EA5A4")
-LIGHT_BLUE = colors.HexColor("#EAF2FF")
-LIGHT_CYAN = colors.HexColor("#E7F8F6")
-LIGHT_GRAY = colors.HexColor("#F3F5F7")
-MID_GRAY = colors.HexColor("#64748B")
-DARK = colors.HexColor("#172033")
+NAVY = colors.HexColor("#1F2937")
+BLUE = colors.HexColor("#315A8A")
+CYAN = colors.HexColor("#4B748F")
+LIGHT_BLUE = colors.HexColor("#EDF3F8")
+LIGHT_CYAN = colors.HexColor("#F2F6F8")
+LIGHT_GRAY = colors.HexColor("#F5F5F4")
+TABLE_HEADER = colors.HexColor("#E7E5E4")
+MID_GRAY = colors.HexColor("#5F6368")
+DARK = colors.HexColor("#202124")
 RED = colors.HexColor("#B42318")
 GREEN = colors.HexColor("#147D64")
 
 
 def register_fonts():
-    regular = Path("C:/Windows/Fonts/arial.ttf")
-    bold = Path("C:/Windows/Fonts/arialbd.ttf")
+    regular = Path("C:/Windows/Fonts/times.ttf")
+    bold = Path("C:/Windows/Fonts/timesbd.ttf")
     if regular.exists() and bold.exists():
         pdfmetrics.registerFont(TTFont("ReportRegular", str(regular)))
         pdfmetrics.registerFont(TTFont("ReportBold", str(bold)))
         return "ReportRegular", "ReportBold"
-    return "Helvetica", "Helvetica-Bold"
+    return "Times-Roman", "Times-Bold"
 
 
 FONT, FONT_BOLD = register_fonts()
@@ -61,10 +62,10 @@ def make_styles():
             "Title",
             parent=styles["Title"],
             fontName=FONT_BOLD,
-            fontSize=20,
-            leading=23,
-            textColor=colors.white,
-            alignment=TA_LEFT,
+            fontSize=18,
+            leading=21,
+            textColor=DARK,
+            alignment=TA_CENTER,
             spaceAfter=0,
         ),
         "subtitle": ParagraphStyle(
@@ -72,26 +73,27 @@ def make_styles():
             parent=styles["Normal"],
             fontName=FONT,
             fontSize=10.5,
-            leading=14,
-            textColor=colors.HexColor("#DCE8FF"),
+            leading=13,
+            textColor=MID_GRAY,
+            alignment=TA_CENTER,
         ),
         "section": ParagraphStyle(
             "Section",
             parent=styles["Heading2"],
             fontName=FONT_BOLD,
-            fontSize=13,
-            leading=16,
+            fontSize=11.5,
+            leading=14,
             textColor=NAVY,
-            spaceBefore=5,
-            spaceAfter=6,
+            spaceBefore=7,
+            spaceAfter=4,
             keepWithNext=True,
         ),
         "body": ParagraphStyle(
             "Body",
             parent=styles["BodyText"],
             fontName=FONT,
-            fontSize=9.2,
-            leading=13.1,
+            fontSize=9.6,
+            leading=13.2,
             textColor=DARK,
             spaceAfter=6,
         ),
@@ -99,8 +101,8 @@ def make_styles():
             "Small",
             parent=styles["BodyText"],
             fontName=FONT,
-            fontSize=8.2,
-            leading=10.8,
+            fontSize=8.6,
+            leading=11.2,
             textColor=DARK,
         ),
         "metric": ParagraphStyle(
@@ -118,7 +120,7 @@ def make_styles():
             fontName=FONT_BOLD,
             fontSize=8.1,
             leading=10,
-            textColor=colors.white,
+            textColor=DARK,
             alignment=TA_CENTER,
         ),
         "table_cell": ParagraphStyle(
@@ -189,17 +191,19 @@ def bullet(text):
 
 
 def section_title(number, title):
-    return p(f"<font color='#1D4ED8'>{number}</font>  {title}", "section")
+    number = number.lstrip("0") or "0"
+    return p(f"<font color='#315A8A'>{number}.</font> {title}", "section")
 
 
 def header_footer(canvas, doc):
     canvas.saveState()
     if doc.page > 1:
-        canvas.setFillColor(NAVY)
-        canvas.rect(0, PAGE_HEIGHT - 11 * mm, PAGE_WIDTH, 11 * mm, fill=1, stroke=0)
-        canvas.setFont(FONT_BOLD, 8)
-        canvas.setFillColor(colors.white)
-        canvas.drawString(MARGIN_X, PAGE_HEIGHT - 7.2 * mm, "PARTE II  /  PRUEBAS E INFORME")
+        canvas.setStrokeColor(BLUE)
+        canvas.setLineWidth(0.8)
+        canvas.line(MARGIN_X, PAGE_HEIGHT - 12 * mm, PAGE_WIDTH - MARGIN_X, PAGE_HEIGHT - 12 * mm)
+        canvas.setFont(FONT, 8)
+        canvas.setFillColor(MID_GRAY)
+        canvas.drawString(MARGIN_X, PAGE_HEIGHT - 9.2 * mm, "Informe de práctica: CI/CD y Kubernetes")
 
     canvas.setStrokeColor(colors.HexColor("#D8DEE8"))
     canvas.line(MARGIN_X, 12 * mm, PAGE_WIDTH - MARGIN_X, 12 * mm)
@@ -209,7 +213,7 @@ def header_footer(canvas, doc):
     canvas.drawRightString(
         PAGE_WIDTH - MARGIN_X,
         7.8 * mm,
-        f"26 de julio de 2026  |  Página {doc.page} de 2",
+        f"27 de julio de 2026  |  Página {doc.page} de 2",
     )
     canvas.restoreState()
 
@@ -261,49 +265,62 @@ def build_pdf():
 
     story = []
 
-    hero = Table(
+    heading = Table(
         [
-            [p("Informe de reflexión CI/CD", "title")],
-            [p("Parte II · Pruebas, métricas propias y análisis de la práctica", "subtitle")],
+            [p("INFORME DE PRÁCTICA", "subtitle")],
+            [p("Pruebas, métricas DORA y reflexión sobre el pipeline CI/CD", "title")],
+            [p("Inventario App: Docker, GitHub Actions y Kubernetes", "subtitle")],
         ],
         colWidths=[PAGE_WIDTH - 2 * MARGIN_X],
-        rowHeights=[19 * mm, 10 * mm],
     )
-    hero.setStyle(
+    heading.setStyle(
         TableStyle(
             [
-                ("BACKGROUND", (0, 0), (-1, -1), NAVY),
-                ("LEFTPADDING", (0, 0), (-1, -1), 9 * mm),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 9 * mm),
-                ("TOPPADDING", (0, 0), (-1, -1), 4 * mm),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 3 * mm),
+                ("BACKGROUND", (0, 0), (-1, -1), colors.white),
+                ("LINEBELOW", (0, -1), (-1, -1), 1.2, BLUE),
+                ("LEFTPADDING", (0, 0), (-1, -1), 4 * mm),
+                ("RIGHTPADDING", (0, 0), (-1, -1), 4 * mm),
+                ("TOPPADDING", (0, 0), (-1, 0), 1 * mm),
+                ("TOPPADDING", (0, 1), (-1, 1), 2 * mm),
+                ("BOTTOMPADDING", (0, -1), (-1, -1), 3 * mm),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
             ]
         )
     )
-    story.extend([hero, Spacer(1, 4 * mm)])
+    story.extend([heading, Spacer(1, 4 * mm)])
 
     meta = Table(
         [
             [
-                p("<b>Integrantes</b><br/>José Vanegas · Miguel Vanegas", "small"),
-                p("<b>Repositorio público</b><br/>github.com/miguis145/inventario-app", "small"),
-                p("<b>Fecha</b><br/>26-jul-2026", "small"),
+                p("<b>Integrantes:</b>", "small"),
+                p("José Vanegas y Miguel Vanegas", "small"),
+            ],
+            [
+                p("<b>Trabajo:</b>", "small"),
+                p("Parte II: pruebas y elaboración del informe", "small"),
+            ],
+            [
+                p("<b>Repositorio:</b>", "small"),
+                p("github.com/miguis145/inventario-app", "small"),
+            ],
+            [
+                p("<b>Fecha:</b>", "small"),
+                p("27 de julio de 2026", "small"),
             ],
         ],
-        colWidths=[66 * mm, 78 * mm, 30 * mm],
+        colWidths=[32 * mm, 142 * mm],
     )
     meta.setStyle(
         TableStyle(
             [
                 ("BACKGROUND", (0, 0), (-1, -1), LIGHT_GRAY),
                 ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#D8DEE8")),
-                ("INNERGRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#D8DEE8")),
+                ("LINEBELOW", (0, 0), (-1, -2), 0.3, colors.HexColor("#D8DEE8")),
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
                 ("LEFTPADDING", (0, 0), (-1, -1), 7),
                 ("RIGHTPADDING", (0, 0), (-1, -1), 7),
-                ("TOPPADDING", (0, 0), (-1, -1), 6),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+                ("TOPPADDING", (0, 0), (-1, -1), 3),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
             ]
         )
     )
@@ -348,7 +365,7 @@ def build_pdf():
     verification_table.setStyle(
         TableStyle(
             [
-                ("BACKGROUND", (0, 0), (-1, 0), NAVY),
+                ("BACKGROUND", (0, 0), (-1, 0), TABLE_HEADER),
                 ("BACKGROUND", (0, 1), (-1, -1), colors.white),
                 ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#C9D1DC")),
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
@@ -394,8 +411,8 @@ def build_pdf():
     callout.setStyle(
         TableStyle(
             [
-                ("BACKGROUND", (0, 0), (-1, -1), LIGHT_CYAN),
-                ("BOX", (0, 0), (-1, -1), 0.8, CYAN),
+                ("BACKGROUND", (0, 0), (-1, -1), LIGHT_GRAY),
+                ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#A8A29E")),
                 ("LEFTPADDING", (0, 0), (-1, -1), 8),
                 ("RIGHTPADDING", (0, 0), (-1, -1), 8),
                 ("TOPPADDING", (0, 0), (-1, -1), 7),
@@ -417,24 +434,48 @@ def build_pdf():
         )
     )
 
-    cards = Table(
-        [[
-            metric_card("00:02:55 · ÉLITE", "Lead time promedio", BLUE),
-            metric_card("2 por día · ÉLITE", "Frecuencia de despliegue", CYAN),
-            metric_card("33,33 % · MEDIO", "Change failure rate", RED),
-        ]],
-        colWidths=[56 * mm, 56 * mm, 56 * mm],
+    summary_data = [
+        [
+            p("Indicador", "table_header"),
+            p("Cálculo realizado", "table_header"),
+            p("Resultado", "table_header"),
+            p("Nivel", "table_header"),
+        ],
+        [
+            p("Lead time for changes", "table_cell_left"),
+            p("(00:03:31 + 00:02:19) / 2", "table_cell"),
+            p("00:02:55", "table_cell"),
+            p("Élite", "table_cell"),
+        ],
+        [
+            p("Frecuencia de despliegue", "table_cell_left"),
+            p("2 cambios correctos / 1 día", "table_cell"),
+            p("2 por día", "table_cell"),
+            p("Élite", "table_cell"),
+        ],
+        [
+            p("Change failure rate", "table_cell_left"),
+            p("1 corrección / 3 intentos × 100", "table_cell"),
+            p("33,33 %", "table_cell"),
+            p("Medio", "table_cell"),
+        ],
+    ]
+    summary_table = Table(
+        summary_data,
+        colWidths=[48 * mm, 63 * mm, 34 * mm, 29 * mm],
     )
-    cards.setStyle(
+    summary_table.setStyle(
         TableStyle(
             [
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("LEFTPADDING", (0, 0), (-1, -1), 2),
-                ("RIGHTPADDING", (0, 0), (-1, -1), 2),
+                ("BACKGROUND", (0, 0), (-1, 0), TABLE_HEADER),
+                ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#A8A29E")),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                ("TOPPADDING", (0, 0), (-1, -1), 4),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
             ]
         )
     )
-    story.extend([cards, Spacer(1, 4 * mm)])
+    story.extend([summary_table, Spacer(1, 4 * mm)])
 
     dora_data = [
         [
@@ -469,7 +510,7 @@ def build_pdf():
     dora_table.setStyle(
         TableStyle(
             [
-                ("BACKGROUND", (0, 0), (-1, 0), NAVY),
+                ("BACKGROUND", (0, 0), (-1, 0), TABLE_HEADER),
                 ("BACKGROUND", (0, 1), (-1, -1), colors.white),
                 ("GRID", (0, 0), (-1, -1), 0.55, colors.HexColor("#C9D1DC")),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
@@ -537,7 +578,7 @@ def build_pdf():
     problems_table.setStyle(
         TableStyle(
             [
-                ("BACKGROUND", (0, 0), (-1, 0), NAVY),
+                ("BACKGROUND", (0, 0), (-1, 0), TABLE_HEADER),
                 ("BACKGROUND", (0, 1), (-1, -1), colors.white),
                 ("GRID", (0, 0), (-1, -1), 0.45, colors.HexColor("#C9D1DC")),
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
