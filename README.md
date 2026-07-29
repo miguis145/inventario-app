@@ -862,6 +862,8 @@ El archivo [índice de capturas reales](evidencias/capturas-reales/indice.md) re
 
 El entregable escrito de la Parte II está disponible en [Informe de reflexión CI/CD](output/pdf/Informe_Reflexion_CI_CD_Inventario.pdf). Tiene dos páginas e incluye la justificación Blue-Green, la observación sobre persistencia, los problemas encontrados y los tres resultados DORA.
 
+La [entrega completa del proyecto](output/pdf/Entrega_Completa_Inventario_App.pdf) reúne el recorrido técnico, las evidencias principales y una sección ordenada de comandos para realizar la demostración.
+
 | Número | Evidencia | Comando utilizado | Resultado esperado | Nombre o ruta de la captura |
 |---:|---|---|---|---|
 | 1 | Versiones de las herramientas | `node --version`, `npm.cmd --version`, `git --version`, `docker --version`, `kubectl version --client`, `minikube version` | Cada herramienta muestra su versión | [51-versiones-herramientas.png](evidencias/capturas-reales/51-versiones-herramientas.png) |
